@@ -21,3 +21,8 @@ log_record = logging.LogRecord("my_logger", logging.INFO, None, None, message, N
 formatter = RedactingFormatter(fields=("email", "ssn", "password"))
 print(formatter.format(log_record))
 
+get_logger = __import__('filtered_logger').get_logger
+PII_FIELDS = __import__('filtered_logger').PII_FIELDS
+
+print(get_logger.__annotations__.get('return'))
+print("PII_FIELDS: {}".format(len(PII_FIELDS)))

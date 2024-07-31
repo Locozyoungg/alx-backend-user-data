@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import re
 import logging
-from typing import List
+from typing import List, Tuple
 
 def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:
     pattern = f"({'|'.join(fields)})=.*?{separator}"
@@ -20,3 +20,17 @@ class RedactingFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         original_message = super().format(record)
         return filter_datum(self.fields, self.REDACTION, original_message, self.SEPARATOR)
+    
+PII_FIELDS: Tuple[str, ...] = ("name", "email", "phone", "ssn", "password")
+
+def get_logger() -> logging.Logger:
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    stream_handler = logging.StreamHandler()
+    formatter = RedactingFormatter(fields=PII_FIELDS)
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    return logger
